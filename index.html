@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="en" ng-app="lunchApp">
+<html lang="en" ng-app="ShoppingListCheckOff">
 
 <head>
-    <title>Lunch Checker</title>
+    <title>Shopping List Check Off</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="styles.css">
     <script src="angular.min.js"></script>
@@ -10,21 +10,36 @@
 </head>
 
 <body>
-    <div class="container" ng-controller="LunchCheckController">
-        <h1>Lunch Checker</h1>
+    <div class="container">
+        <h1>Shopping List Check Off</h1>
 
-        <div class="form-group">
-            <input id="lunch-menu" ng-model="lunchMenu" type="text"
-                placeholder="list comma separated dishes you usually have for lunch" class="form-control">
-        </div>
-        <div class="form-group">
-            <button class="btn btn-default" ng-click="checkLunch()">Check If Too Much</button>
-        </div>
-        <div class="form-group message">
-            <p ng-style="messageStyle" class="message">{{ message }}</p>
+        <div class="row">
+
+            <!-- To Buy List -->
+            <div ng-controller="ToBuyController as toBuy">
+                <h2>To Buy:</h2>
+                <ul>
+                    <li ng-repeat="item in toBuy.items" class="list-section">
+                        Buy {{item.quantity}} {{item.name}}
+                        <button ng-click="toBuy.buyItem($index)">Bought</button>
+                    </li>
+                </ul>
+                <div ng-if="toBuy.items.length === 0" class="emptyMessage">Everything is bought!</div>
+            </div>
+
+            <!-- Already Bought List -->
+            <div ng-controller="AlreadyBoughtController as alreadyBought">
+                <h2>Already Bought:</h2>
+                <ul>
+                    <li ng-repeat="item in alreadyBought.items" class="list-section">
+                        Bought {{item.quantity}} {{item.name}}
+
+                    </li>
+                </ul>
+                <div ng-if="alreadyBought.items.length === 0" class="emptyMessage">Nothing bought yet.</div>
+            </div>
         </div>
     </div>
-
 </body>
 
 </html>
