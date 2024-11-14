@@ -1,42 +1,37 @@
 <!doctype html>
-<html lang="en" ng-app="ShoppingListCheckOff">
+<html lang="en" ng-app="NarrowItDownApp">
 
 <head>
-    <title>Shopping List Check Off</title>
+    <title>Narrow Down Your Menu Choice</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="styles.css">
+    <!-- AngularJS Library -->
     <script src="angular.min.js"></script>
+    <!-- App JavaScript -->
     <script src="app.js"></script>
 </head>
 
-<body>
+<body ng-controller="NarrowItDownController as narrowCtrl">
     <div class="container">
-        <h1>Shopping List Check Off</h1>
+        <h1>Narrow Down Your Chinese Menu Choice</h1>
 
-        <div class="row">
+        <div class="search-results-wrapper">
+            <!-- Search Section on the Left -->
+            <div class="search-section">
+                <div class="form-group">
+                    <input type="text" ng-model="narrowCtrl.searchTerm" placeholder="search term" class="form-control">
+                </div>
+                <div class="form-group narrow-button">
+                    <button ng-click="narrowCtrl.narrowItDown()" class="btn btn-primary">Narrow It Down For Me!</button>
+                </div>
 
-            <!-- To Buy List -->
-            <div ng-controller="ToBuyController as toBuy">
-                <h2>To Buy:</h2>
-                <ul>
-                    <li ng-repeat="item in toBuy.items" class="list-section">
-                        Buy {{item.quantity}} {{item.name}}
-                        <button ng-click="toBuy.buyItem($index)">Bought</button>
-                    </li>
-                </ul>
-                <div ng-if="toBuy.items.length === 0" class="emptyMessage">Everything is bought!</div>
+                <p ng-if="narrowCtrl.nothingFound" class="no-results">Nothing found</p>
             </div>
 
-            <!-- Already Bought List -->
-            <div ng-controller="AlreadyBoughtController as alreadyBought">
-                <h2>Already Bought:</h2>
-                <ul>
-                    <li ng-repeat="item in alreadyBought.items" class="list-section">
-                        Bought {{item.quantity}} {{item.name}}
-
-                    </li>
-                </ul>
-                <div ng-if="alreadyBought.items.length === 0" class="emptyMessage">Nothing bought yet.</div>
+            <!-- Results Section on the Right -->
+            <div class="results-section">
+                <!-- Custom directive to display found items with remove functionality -->
+                <found-items items="narrowCtrl.found" on-remove="narrowCtrl.removeItem(index)"></found-items>
             </div>
         </div>
     </div>

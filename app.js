@@ -1,58 +1,78 @@
 (function () {
     'use strict';
 
-    angular.module('ShoppingListCheckOff', [])
-        .controller('ToBuyController', ToBuyController)
-        .controller('AlreadyBoughtController', AlreadyBoughtController)
-        .service('ShoppingListCheckOffService', ShoppingListCheckOffService);
+    angular.module('NarrowItDownApp', [])
+        .controller('NarrowItDownController', NarrowItDownController)
+        .service('MenuSearchService', MenuSearchService)
+        .directive('foundItems', FoundItemsDirective);
 
-    // #1 - ToBuyController
-    ToBuyController.$inject = ['ShoppingListCheckOffService'];
-    function ToBuyController(ShoppingListCheckOffService) {
-        var toBuy = this;
+    NarrowItDownController.$inject = ['MenuSearchService'];
+    function NarrowItDownController(MenuSearchService) {
+        var ctrl = this;
+        ctrl.searchTerm = '';
+        ctrl.found = [];
+        ctrl.nothingFound = false;
 
-        toBuy.items = ShoppingListCheckOffService.getBuyItems();
+        // Function to trigger search
+        ctrl.narrowItDown = function () {
+            if (!ctrl.searchTerm) {
+                ctrl.nothingFound = true;
+                ctrl.found = [];
+                return;
+            }
 
-        toBuy.buyItem = function (itemIndex) {
-            ShoppingListCheckOffService.buyItem(itemIndex);
+            MenuSearchService.getMatchedMenuItems(ctrl.searchTerm)
+                .then(function (result) {
+                    ctrl.found = result;
+                    ctrl.nothingFound = ctrl.found.length === 0;
+                });
+        };
+
+        // Function to remove item from the found array
+        ctrl.removeItem = function (index) {
+            ctrl.found.splice(index, 1);
         };
     }
 
-    // #2 - AlreadyBoughtController
-    AlreadyBoughtController.$inject = ['ShoppingListCheckOffService'];
-    function AlreadyBoughtController(ShoppingListCheckOffService) {
-        var alreadyBought = this;
-
-        alreadyBought.items = ShoppingListCheckOffService.getBoughtItems();
-    }
-
-    // Define the service for data sharing
-    function ShoppingListCheckOffService() {
+    MenuSearchService.$inject = ['$http'];
+    function MenuSearchService($http) {
         var service = this;
 
-        var toBuyItems = [
-            { name: "cookies", quantity: 10 },
-            { name: "milk", quantity: 2 },
-            { name: "bread", quantity: 1 },
-            { name: "cheese", quantity: 5 },
-            { name: "chocolate", quantity: 3 }
-        ];
+        service.getMatchedMenuItems = function (searchTerm) {
+            return $http.get('https://coursera-jhu-default-rtdb.firebaseio.com/menu_items.json')
+                .then(function (response) {
+                    var allItems = [];
 
-        var boughtItems = [];
+                    // Loop through each category and collect menu items
+                    for (var category in response.data) {
+                        if (response.data[category].menu_items) {
+                            allItems = allItems.concat(response.data[category].menu_items);
+                        }
+                    }
 
-        service.getBuyItems = function () {
-            return toBuyItems;
+                    // Filter based on the search term
+                    var foundItems = allItems.filter(function (item) {
+                        return item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase());
+                    });
+
+                    return foundItems;
+                });
         };
-
-        service.getBoughtItems = function () {
-            return boughtItems;
+    }
+    function FoundItemsDirective() {
+        return {
+            templateUrl: 'foundItems.html',
+            scope: {
+                items: '<',
+                onRemove: '&'
+            },
+            controller: FoundItemsDirectiveController,
+            controllerAs: 'dirCtrl',
+            bindToController: true
         };
-
-        // Move item from "To Buy" list to "Already Bought" list
-        service.buyItem = function (itemIndex) {
-            var item = toBuyItems.splice(itemIndex, 1)[0];
-            boughtItems.push(item);
-        };
+    }
+    function FoundItemsDirectiveController() {
+        var dirCtrl = this;
     }
 
 })();
