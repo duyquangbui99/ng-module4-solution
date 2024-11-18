@@ -1,40 +1,28 @@
 <!doctype html>
-<html lang="en" ng-app="NarrowItDownApp">
+<html lang="en" ng-app="MenuApp">
 
 <head>
-    <title>Narrow Down Your Menu Choice</title>
+    <title>Restaurant Menu</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="styles.css">
-    <!-- AngularJS Library -->
-    <script src="angular.min.js"></script>
-    <!-- App JavaScript -->
-    <script src="app.js"></script>
+    <script src="lib/angular.min.js"></script>
+    <script src="lib/angular-ui-route.min.js"></script>
+    <script src="app/menuapp.module.js"></script>
+    <script src="app/data.module.js"></script>
+    <script src="app/menudata.service.js"></script>
+    <script src="app/categories.component.js"></script>
+    <script src="app/items.component.js"></script>
+    <script src="app/routes.js"></script>
 </head>
 
-<body ng-controller="NarrowItDownController as narrowCtrl">
-    <div class="container">
-        <h1>Narrow Down Your Chinese Menu Choice</h1>
-
-        <div class="search-results-wrapper">
-            <!-- Search Section on the Left -->
-            <div class="search-section">
-                <div class="form-group">
-                    <input type="text" ng-model="narrowCtrl.searchTerm" placeholder="search term" class="form-control">
-                </div>
-                <div class="form-group narrow-button">
-                    <button ng-click="narrowCtrl.narrowItDown()" class="btn btn-primary">Narrow It Down For Me!</button>
-                </div>
-
-                <p ng-if="narrowCtrl.nothingFound" class="no-results">Nothing found</p>
-            </div>
-
-            <!-- Results Section on the Right -->
-            <div class="results-section">
-                <!-- Custom directive to display found items with remove functionality -->
-                <found-items items="narrowCtrl.found" on-remove="narrowCtrl.removeItem(index)"></found-items>
-            </div>
-        </div>
-    </div>
+<body>
+    <header>
+        <h1>Restaurant Menu</h1>
+        <p>Explore our menu categories and delicious items</p>
+    </header>
+    <main>
+        <ui-view></ui-view>
+    </main>
 </body>
 
 </html>
